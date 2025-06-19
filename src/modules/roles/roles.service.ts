@@ -1,11 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class RolesService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+  constructor(private prismaService: PrismaService) {}
+  async create(createRoleDto: CreateRoleDto) {
+    const roleExist = await this.prismaService.role.findFirst({
+      where: {
+        name: {
+          equals: createRoleDto.name,
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    if (roleExist) {
+      throw new HttpException(
+        {
+          code: HttpStatus.CONFLICT,
+          message: 'role sudah ada',
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    return await this.prismaService.role.create({
+      data: {
+        name: createRoleDto.name,
+      },
+    });
   }
 
   findAll() {
