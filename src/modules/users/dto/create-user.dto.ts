@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { Transform } from 'class-transformer';
 import {
   IsEmail,
   IsInt,
@@ -20,6 +21,7 @@ export class CreateUserDto {
   @MinLength(6)
   password: string;
 
+  @Transform(({ value }) => parseInt(value, 10))
   @IsNotEmpty()
   @IsInt()
   roleId: number;
