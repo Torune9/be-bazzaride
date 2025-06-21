@@ -11,6 +11,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LoginUserDto } from './dto/login.dto';
 
 @Controller('user')
 export class UsersController {
@@ -27,14 +28,28 @@ export class UsersController {
     };
   }
 
+  @Post('login')
+  async login(@Body() loginUserDtoo: LoginUserDto) {
+    const { data } = await this.usersService.login(loginUserDtoo);
+
+    return {
+      message: 'login berhasil',
+      data: data,
+    };
+  }
+
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const { data } = await this.usersService.findOne(id);
+    return {
+      message: 'user ditemukan',
+      data: data,
+    };
   }
 
   @Patch(':id')
