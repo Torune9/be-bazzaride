@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile } from '@nestjs/common';
 import { ProfileService } from './profile.service';
+import { imageUploadInterceptor } from 'src/common/interception-multer';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
@@ -8,8 +9,9 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Post()
-  create(@Body() createProfileDto: CreateProfileDto) {
-    return this.profileService.create(createProfileDto);
+  @imageUploadInterceptor('image')
+  create(@Body() createProfileDto: CreateProfileDto, @UploadedFile() file: Express.Multer.File ) {
+    return this.profileService.create(createProfileDto, file);
   }
 
   @Get()

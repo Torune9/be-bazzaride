@@ -8,11 +8,11 @@ import {
 } from 'class-validator';
 
 export class CreateProfileDto {
-  @IsEmpty()
+  @IsNotEmpty()
   @IsString()
   firstName: string;
 
-  @IsEmpty()
+  @IsNotEmpty()
   @IsString()
   lastName: string;
 

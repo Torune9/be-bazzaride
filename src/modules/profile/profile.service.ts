@@ -1,11 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { CloudinaryService } from 'src/libs/cloudinary/cloudinary.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ProfileService {
-  create(createProfileDto: CreateProfileDto) {
-    return 'This action adds a new profile';
+  constructor(
+    private prisma: PrismaService,
+    private cloudinary: CloudinaryService,
+  ) {}
+  async create(createProfileDto: CreateProfileDto, file: Express.Multer.File) {
+    const {userId, firstName, lastName, image } = createProfileDto
+
+    let imageUrl: string | undefined
+
+    if(file) {
+      imageUrl = await this.cloudinary.uploadImage(file)
+    }
+
+    const profile = await this.prisma.profile.create({
+      data: {
+        firstName,
+        lastName,
+        image: imageUrl,
+        user: {
+          connect: {id: userId}
+        }
+      }
+    })
+
+    return profile
   }
 
   findAll() {
