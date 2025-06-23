@@ -30,11 +30,11 @@ export class UsersController {
 
   @Post('login')
   async login(@Body() loginUserDtoo: LoginUserDto) {
-    const { data } = await this.usersService.login(loginUserDtoo);
+    const { token } = await this.usersService.login(loginUserDtoo);
 
     return {
       message: 'login berhasil',
-      data: data,
+      access_token: token,
     };
   }
 
