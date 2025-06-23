@@ -11,12 +11,12 @@ export class ProfileService {
     private cloudinary: CloudinaryService,
   ) {}
   async create(createProfileDto: CreateProfileDto, file: Express.Multer.File) {
-    const {userId, firstName, lastName, image } = createProfileDto
+    const { userId, firstName, lastName, image } = createProfileDto;
 
-    let imageUrl: string | undefined
+    let imageUrl: string | undefined;
 
-    if(file) {
-      imageUrl = await this.cloudinary.uploadImage(file)
+    if (file) {
+      imageUrl = await this.cloudinary.uploadImage(file);
     }
 
     const profile = await this.prisma.profile.create({
@@ -25,12 +25,12 @@ export class ProfileService {
         lastName,
         image: imageUrl,
         user: {
-          connect: {id: userId}
-        }
-      }
-    })
+          connect: { id: userId },
+        },
+      },
+    });
 
-    return profile
+    return profile;
   }
 
   findAll() {
