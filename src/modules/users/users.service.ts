@@ -3,7 +3,6 @@ import {
   ConflictException,
   HttpException,
   HttpStatus,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,9 +12,13 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { dataLogin } from 'src/model/userLogin.model.';
 import { LoginUserDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class UsersService {
-  @Inject() private prismaService: PrismaService;
+  constructor(
+    private prismaService: PrismaService,
+    private jwtService: JwtService,
+  ) {}
 
   async register(createUserDto: CreateUserDto) {
     const userExist = await this.prismaService.user.findFirst({
@@ -42,7 +45,7 @@ export class UsersService {
     };
   }
 
-  async login(loginUserDto: LoginUserDto): Promise<Record<'data', dataLogin>> {
+  async login(loginUserDto: LoginUserDto): Promise<Record<'token', string>> {
     const userData = await this.prismaService.user.findFirst({
       where: {
         email: {
@@ -63,6 +66,12 @@ export class UsersService {
       loginUserDto.password,
       userData.password,
     );
+
+    const payload = {
+      id: userData.id,
+      userName: userData.username,
+      email: loginUserDto.email,
+    };
     if (!truePassword) {
       throw new HttpException(
         {
@@ -73,7 +82,7 @@ export class UsersService {
       );
     }
     return {
-      data: userData,
+      token: await this.jwtService.signAsync(payload),
     };
   }
 
