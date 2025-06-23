@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UploadedFile,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { imageUploadInterceptor } from 'src/common/interception-multer';
 import { CreateProfileDto } from './dto/create-profile.dto';
@@ -10,27 +21,63 @@ export class ProfileController {
 
   @Post()
   @imageUploadInterceptor('image')
-  create(@Body() createProfileDto: CreateProfileDto, @UploadedFile() file: Express.Multer.File ) {
-    return this.profileService.create(createProfileDto, file);
+  @HttpCode(HttpStatus.CREATED)
+  async create(
+    @Body() createProfileDto: CreateProfileDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const profile = await this.profileService.create(createProfileDto, file);
+
+    return {
+      data: profile,
+      message: 'Profile berhasil dibuat',
+    };
   }
 
   @Get()
-  findAll() {
-    return this.profileService.findAll();
+  async findAll() {
+    const profile = await this.profileService.findAll();
+
+    return {
+      data: profile,
+      message: 'Profile berhasil ditemukan',
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.profileService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const profile = await this.profileService.findOne(id);
+
+    return {
+      data: profile,
+      message: 'Profile ditemukan!',
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.update(+id, updateProfileDto);
+  @imageUploadInterceptor('image')
+  async update(
+    @Param('id') id: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const profile = await this.profileService.update(
+      id,
+      updateProfileDto,
+      file,
+    );
+    return {
+      data: profile,
+      message: 'Berhasil update profile',
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.profileService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const profile = await this.profileService.remove(id);
+
+    return {
+      message: 'Profile berhasil dihapus',
+    };
   }
 }

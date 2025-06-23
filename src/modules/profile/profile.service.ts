@@ -1,51 +1,143 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { CloudinaryService } from 'src/libs/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
+import { getPublicIdFromUrl } from 'src/helper/get-public-id';
 
 @Injectable()
 export class ProfileService {
   constructor(
-    private prisma: PrismaService,
+    private prismaService: PrismaService,
     private cloudinary: CloudinaryService,
   ) {}
   async create(createProfileDto: CreateProfileDto, file: Express.Multer.File) {
-    const { userId, firstName, lastName, image } = createProfileDto;
+    try {
+      const { userId, firstName, lastName } = createProfileDto;
 
-    let imageUrl: string | undefined;
+      let imageUrl: string | undefined;
 
-    if (file) {
-      imageUrl = await this.cloudinary.uploadImage(file);
-    }
+      if (file) {
+        imageUrl = await this.cloudinary.uploadImage(file);
+      }
 
-    const profile = await this.prisma.profile.create({
-      data: {
-        firstName,
-        lastName,
-        image: imageUrl,
-        user: {
-          connect: { id: userId },
+      const profile = await this.prismaService.profile.create({
+        data: {
+          firstName,
+          lastName,
+          image: imageUrl,
+          user: {
+            connect: { id: userId },
+          },
         },
-      },
+      });
+
+      return profile;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          throw new NotFoundException('Profile tidak ditemukan');
+        }
+
+        if (error.code === 'P2002') {
+          throw new ConflictException('Profile sudah ada');
+        }
+      }
+
+      throw new BadRequestException();
+    }
+  }
+
+  async findAll() {
+    try {
+      const profile = await this.prismaService.profile.findMany({
+        include: {
+          user: true,
+        },
+      });
+
+      return profile;
+    } catch (error) {
+      throw new BadRequestException();
+    }
+  }
+
+  async findOne(id: string) {
+    const profile = await this.prismaService.profile.findUnique({
+      where: { id },
     });
+
+    if (!profile) {
+      throw new NotFoundException('Profile tidak ditemukan');
+    }
 
     return profile;
   }
 
-  findAll() {
-    return `This action returns all profile`;
+  async update(
+    id: string,
+    updateProfileDto: UpdateProfileDto,
+    file?: Express.Multer.File,
+  ) {
+    try {
+      if (file) {
+        const newImageUrl = await this.cloudinary.uploadImage(file);
+        updateProfileDto.image = newImageUrl;
+      }
+
+      const [existing, update] = await this.prismaService.$transaction([
+        this.prismaService.profile.findUnique({
+          where: { id },
+        }),
+        this.prismaService.profile.update({
+          where: { id },
+          data: updateProfileDto,
+        }),
+      ]);
+
+      if (!existing) {
+        throw new NotFoundException('Profile tidak ditemukan');
+      }
+
+      if (file && existing.image) {
+        try {
+          const publicId = getPublicIdFromUrl(existing.image);
+          await this.cloudinary.deleteImage(publicId);
+        } catch (error) {
+          throw new InternalServerErrorException('Gagal upload profile');
+        }
+      }
+
+      return update;
+    } catch (error) {
+      throw new InternalServerErrorException('Gagal mengupdate profile');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
-  }
+  async remove(id: string) {
+    try {
+      const profile = await this.prismaService.profile.delete({
+        where: { id },
+      });
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
-  }
+      return profile;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Profile tidak ditemukan');
+      }
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
+      throw new InternalServerErrorException('Gagal menghapus profile');
+    }
   }
 }
