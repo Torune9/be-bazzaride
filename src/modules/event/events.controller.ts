@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
@@ -13,13 +21,23 @@ export class EventsController {
   }
 
   @Get()
-  findAll() {
-    return this.eventsService.findAll();
+  async findAll() {
+    const event = await this.eventsService.findAll();
+
+    return {
+      message: 'data event berhasil di dapatkan',
+      data: event,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const event = await this.eventsService.findOne(id);
+
+    return {
+      message: `Data event ${id} berhasil di dapatkan!`,
+      data: event,
+    };
   }
 
   @Patch(':id')
@@ -28,7 +46,11 @@ export class EventsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const event = await this.eventsService.remove(id);
+
+    return {
+      message: 'Event berhasil dihapus!',
+    };
   }
 }

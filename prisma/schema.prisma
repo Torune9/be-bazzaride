@@ -26,6 +26,7 @@ model Profile {
   lastName String
   image String?
   userId String @unique
+  description String?
 
   user User @relation(fields: [userId],references: [id])
 }

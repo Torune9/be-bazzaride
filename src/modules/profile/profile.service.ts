@@ -21,7 +21,7 @@ export class ProfileService {
   ) {}
   async create(createProfileDto: CreateProfileDto, file: Express.Multer.File) {
     try {
-      const { userId, firstName, lastName } = createProfileDto;
+      const { userId, firstName, lastName, description } = createProfileDto;
 
       let imageUrl: string | undefined;
 
@@ -33,6 +33,7 @@ export class ProfileService {
         data: {
           firstName,
           lastName,
+          description,
           image: imageUrl,
           user: {
             connect: { id: userId },
@@ -44,7 +45,7 @@ export class ProfileService {
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new NotFoundException('Profile tidak ditemukan');
+          throw new NotFoundException('User id tidak ditemukan');
         }
 
         if (error.code === 'P2002') {
