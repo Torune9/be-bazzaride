@@ -10,7 +10,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
-import { dataLogin } from 'src/model/userLogin.model.';
 import { LoginUserDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 @Injectable()
@@ -45,7 +44,9 @@ export class UsersService {
     };
   }
 
-  async login(loginUserDto: LoginUserDto): Promise<Record<'token', string>> {
+  async login(
+    loginUserDto: LoginUserDto,
+  ): Promise<{ data: object; token: string }> {
     const userData = await this.prismaService.user.findFirst({
       where: {
         email: {
@@ -82,6 +83,7 @@ export class UsersService {
       );
     }
     return {
+      data: payload,
       token: await this.jwtService.signAsync(payload),
     };
   }
