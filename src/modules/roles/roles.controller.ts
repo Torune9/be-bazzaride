@@ -7,10 +7,13 @@ import {
   Param,
   Delete,
   HttpStatus,
+  ParseIntPipe,
+  UseFilters,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { paramBadRequest } from 'src/common/filters/paramBadRequest.filter';
 
 @Controller('role')
 export class RolesController {
@@ -27,22 +30,41 @@ export class RolesController {
   }
 
   @Get()
-  findAll() {
-    return this.rolesService.findAll();
+  async findAll() {
+    const { data } = await this.rolesService.findAll();
+    return {
+      message: 'data role berhasil di dapatkan',
+      data,
+    };
   }
-
+  @UseFilters(paramBadRequest)
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.rolesService.findOne(+id);
   }
-
+  @UseFilters(paramBadRequest)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(+id, updateRoleDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateRoleDto: UpdateRoleDto,
+  ) {
+    const { data, message } = await this.rolesService.update(
+      +id,
+      updateRoleDto,
+    );
+    return {
+      message: message || 'role berhasil di ubah',
+      data: data,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const isDelete = await this.rolesService.remove(+id);
+    if (isDelete) {
+      return {
+        message: 'role berhasil di hapus',
+      };
+    }
   }
 }
