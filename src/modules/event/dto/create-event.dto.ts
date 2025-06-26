@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { Transform } from 'class-transformer';
 import {
   IsInt,
   IsNotEmpty,
@@ -20,6 +21,7 @@ export class CreateEventDto {
   @IsString()
   description: string;
 
+  @Transform(({ value }) => parseInt(value, 10))
   @IsInt()
   @IsNotEmpty()
   quota: number;
@@ -27,8 +29,4 @@ export class CreateEventDto {
   @IsNotEmpty()
   @IsString()
   address: string;
-
-  @IsNotEmpty()
-  @IsString()
-  poster: string;
 }

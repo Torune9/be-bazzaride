@@ -6,18 +6,31 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  HttpStatus,
+  UploadedFile,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { imageUploadInterceptor } from 'src/common/interception-multer';
 
-@Controller('events')
+@Controller('event')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventsService.create(createEventDto);
+  @imageUploadInterceptor('poster')
+  @HttpCode(HttpStatus.CREATED)
+  async create(
+    @Body() createEventDto: CreateEventDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const event = await this.eventsService.create(createEventDto, file);
+    return {
+      message: 'Event berhasil dibuat',
+      data: event,
+    };
   }
 
   @Get()
@@ -41,13 +54,22 @@ export class EventsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventsService.update(+id, updateEventDto);
-  }
+  @imageUploadInterceptor('poster')
+  async update(
+    @Param('id') id: string,
+    @Body() updateEventDto: UpdateEventDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const event = await this.eventsService.update(id, updateEventDto, file);
 
+    return {
+      message: 'Update event berhasil!',
+      data: event,
+    };
+  }
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    const event = await this.eventsService.remove(id);
+    await this.eventsService.remove(id);
 
     return {
       message: 'Event berhasil dihapus!',

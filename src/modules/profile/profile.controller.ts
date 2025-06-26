@@ -74,7 +74,7 @@ export class ProfileController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    const profile = await this.profileService.remove(id);
+    await this.profileService.remove(id);
 
     return {
       message: 'Profile berhasil dihapus',

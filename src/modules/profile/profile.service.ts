@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ConflictException,
-  HttpException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -88,39 +87,34 @@ export class ProfileService {
     updateProfileDto: UpdateProfileDto,
     file?: Express.Multer.File,
   ) {
-    try {
-      if (file) {
-        const newImageUrl = await this.cloudinary.uploadImage(file);
-        updateProfileDto.image = newImageUrl;
-      }
+    const existing = await this.prismaService.profile.findUnique({
+      where: { id },
+    });
 
-      const [existing, update] = await this.prismaService.$transaction([
-        this.prismaService.profile.findUnique({
-          where: { id },
-        }),
-        this.prismaService.profile.update({
-          where: { id },
-          data: updateProfileDto,
-        }),
-      ]);
-
-      if (!existing) {
-        throw new NotFoundException('Profile tidak ditemukan');
-      }
-
-      if (file && existing.image) {
-        try {
-          const publicId = getPublicIdFromUrl(existing.image);
-          await this.cloudinary.deleteImage(publicId);
-        } catch (error) {
-          throw new InternalServerErrorException('Gagal upload profile');
-        }
-      }
-
-      return update;
-    } catch (error) {
-      throw new InternalServerErrorException('Gagal mengupdate profile');
+    if (!existing) {
+      throw new NotFoundException('Profile tidak ditemukan');
     }
+
+    if (file) {
+      const newPosterUrl = await this.cloudinary.uploadImage(file);
+      updateProfileDto.image = newPosterUrl;
+    }
+
+    if (existing.image) {
+      try {
+        const publicId = getPublicIdFromUrl(existing.image);
+        await this.cloudinary.deleteImage(publicId);
+      } catch (error) {
+        throw new InternalServerErrorException('Gagal upload profile');
+      }
+    }
+
+    const updated = await this.prismaService.profile.update({
+      where: { id },
+      data: updateProfileDto,
+    });
+
+    return updated;
   }
 
   async remove(id: string) {
