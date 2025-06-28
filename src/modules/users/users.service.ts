@@ -88,8 +88,17 @@ export class UsersService {
     };
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    const users = await this.prismaService.user.findMany();
+
+    if (users.length === 0) {
+      return {
+        message: 'List user belum tersedia',
+      };
+    }
+    return {
+      data: users,
+    };
   }
 
   async findOne(id: string) {
