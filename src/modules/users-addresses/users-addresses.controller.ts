@@ -17,7 +17,11 @@ export class UsersAddressesController {
 
   @Post()
   create(@Body() createUsersAddressDto: CreateUsersAddressDto) {
-    return this.usersAddressesService.create(createUsersAddressDto);
+    const address = this.usersAddressesService.create(createUsersAddressDto);
+    return {
+      message: 'address berhasil di buat',
+      data: address,
+    };
   }
 
   @Get()
@@ -26,8 +30,13 @@ export class UsersAddressesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersAddressesService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const { data } = await this.usersAddressesService.findOne(id);
+
+    return {
+      message: 'alamat berhasil di dapatkan',
+      data,
+    };
   }
 
   @Patch(':id')
