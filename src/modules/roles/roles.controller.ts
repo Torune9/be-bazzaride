@@ -9,12 +9,15 @@ import {
   HttpStatus,
   ParseIntPipe,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { paramBadRequest } from 'src/common/filters/paramBadRequest.filter';
+import { AuthGuard } from 'src/guard/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('role')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
