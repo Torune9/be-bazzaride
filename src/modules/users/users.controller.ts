@@ -40,8 +40,12 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    const { data, message } = await this.usersService.findAll();
+    return {
+      message: message ? message : 'data user berhasil di dapatkan',
+      data,
+    };
   }
 
   @Get(':id')
