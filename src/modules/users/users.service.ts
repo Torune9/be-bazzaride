@@ -70,7 +70,7 @@ export class UsersService {
 
     const payload = {
       id: userData.id,
-      userName: userData.username,
+      username: userData.username,
       email: loginUserDto.email,
     };
     if (!truePassword) {

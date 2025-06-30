@@ -9,12 +9,18 @@ import {
   HttpCode,
   HttpStatus,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { imageUploadInterceptor } from 'src/common/interception-multer';
+import { AuthGuard } from 'src/guard/auth.guard';
+import { RolesGuard } from 'src/guard/roles.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
+@UseGuards(AuthGuard, RolesGuard)
+@Roles('admin')
 @Controller('event')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
