@@ -40,15 +40,22 @@ export class UsersAddressesController {
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateUsersAddressDto: UpdateUsersAddressDto,
   ) {
-    return this.usersAddressesService.update(+id, updateUsersAddressDto);
+    const { data } = await this.usersAddressesService.update(
+      id,
+      updateUsersAddressDto,
+    );
+    return {
+      message: 'alamat berhasil di update',
+      data,
+    };
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersAddressesService.remove(+id);
+    return this.usersAddressesService.remove(id);
   }
 }

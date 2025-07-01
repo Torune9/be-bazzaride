@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  HttpException,
   HttpStatus,
   Injectable,
   NotFoundException,
@@ -52,11 +53,45 @@ export class UsersAddressesService {
     };
   }
 
-  update(id: number, updateUsersAddressDto: UpdateUsersAddressDto) {
-    return `This action updates a #${id} usersAddress`;
+  async update(id: string, updateUsersAddressDto: UpdateUsersAddressDto) {
+    try {
+      const updateAddress = await this.prismaService.userAddress.update({
+        where: {
+          id: id,
+        },
+        data: {
+          city: updateUsersAddressDto.city,
+          district: updateUsersAddressDto.district,
+        },
+      });
+      return {
+        data: updateAddress,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: 'eror ketika update',
+          errors: error instanceof Error ? error.message : error,
+        },
+        500,
+      );
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} usersAddress`;
+  async remove(id: string) {
+    const removeAddress = await this.prismaService.userAddress.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!removeAddress) {
+      throw new NotFoundException({
+        message: 'alamat tidak ditemukan',
+      });
+    }
+    return {
+      message: 'alamat berhasil dihapus',
+    };
   }
 }
