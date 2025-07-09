@@ -72,7 +72,9 @@ export class ProfileService {
 
   async findOne(id: string) {
     const profile = await this.prismaService.profile.findUnique({
-      where: { id },
+      where: {
+        userId: id,
+      },
     });
 
     if (!profile) {
