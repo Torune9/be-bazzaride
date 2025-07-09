@@ -4,6 +4,7 @@ import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { ProfileModule } from './profile/profile.module';
 import { UsersAddressesModule } from './users-addresses/users-addresses.module';
+import { CategoriesModule } from './categories/categories/categories.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { UsersAddressesModule } from './users-addresses/users-addresses.module';
     RolesModule,
     ProfileModule,
     UsersAddressesModule,
+    CategoriesModule,
   ],
 })
 export class MasterModule {}
