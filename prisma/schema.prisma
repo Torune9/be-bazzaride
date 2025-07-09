@@ -53,14 +53,23 @@ model UserAddress {
   user User @relation(fields: [userId],references: [id])
 }
 
+model Category {
+  id String @id @default(uuid())
+  name String
+
+  event Event[]
+}
+
 model Event {
   id String @id @default(uuid())
   userId String
+  categoryId String?
   name String
   description String?
   quota Int
   address String
   poster String
   
+  category Category? @relation(fields: [categoryId],references: [id])
   user User @relation(fields: [userId],references: [id])
 }
