@@ -42,6 +42,7 @@ model User {
   profile Profile?
   address UserAddress[]
   events Event[]
+  store Store?
 }
 
 model UserAddress {
@@ -58,6 +59,16 @@ model Category {
   name String
 
   event Event[]
+}
+
+model Store {
+  id String @id @default(uuid())
+  userId String @unique
+  name String
+  image String
+
+  user User @relation(fields: [userId], references: [id])
+
 }
 
 model Event {

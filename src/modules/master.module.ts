@@ -5,6 +5,7 @@ import { RolesModule } from './roles/roles.module';
 import { ProfileModule } from './profile/profile.module';
 import { UsersAddressesModule } from './users-addresses/users-addresses.module';
 import { CategoriesModule } from './categories/categories/categories.module';
+import { StoreModule } from './store/store.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CategoriesModule } from './categories/categories/categories.module';
     ProfileModule,
     UsersAddressesModule,
     CategoriesModule,
+    StoreModule,
   ],
 })
 export class MasterModule {}

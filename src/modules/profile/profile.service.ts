@@ -75,6 +75,13 @@ export class ProfileService {
       where: {
         userId: id,
       },
+      include: {
+        user: {
+          include: {
+            store: true,
+          },
+        },
+      },
     });
 
     if (!profile) {
