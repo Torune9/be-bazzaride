@@ -14,5 +14,5 @@ export class CreateStoreDto {
 
   @IsNotEmpty()
   @IsString()
-  description?: string;
+  description: string;
 }

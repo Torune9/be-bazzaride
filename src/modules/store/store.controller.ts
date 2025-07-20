@@ -6,18 +6,34 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  HttpStatus,
+  UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
+import { imageUploadInterceptor } from 'src/common/interception-multer';
+import { AuthGuard } from 'src/guard/auth.guard';
 
 @Controller('store')
 export class StoreController {
   constructor(private readonly storeService: StoreService) {}
-
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createStoreDto: CreateStoreDto) {
-    return this.storeService.create(createStoreDto);
+  @imageUploadInterceptor('image')
+  @HttpCode(HttpStatus.CREATED)
+  async create(
+    @Body() createStoreDto: CreateStoreDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const newStore = await this.storeService.create(createStoreDto, file);
+
+    return {
+      data: newStore,
+      message: 'Store berhasil dibuat',
+    };
   }
 
   @Get()
@@ -40,11 +56,27 @@ export class StoreController {
     };
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
-    return this.storeService.update(+id, updateStoreDto);
+  @imageUploadInterceptor('image')
+  async update(
+    @Param('id') id: string,
+    @Body() updateStoreDto: UpdateStoreDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const updateStore = await this.storeService.update(
+      id,
+      updateStoreDto,
+      file,
+    );
+
+    return {
+      data: updateStore,
+      message: 'Update store berhasil',
+    };
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.storeService.remove(id);

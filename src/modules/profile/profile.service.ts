@@ -114,7 +114,7 @@ export class ProfileService {
         const publicId = getPublicIdFromUrl(existing.image);
         await this.cloudinary.deleteImage(publicId);
       } catch (error) {
-        throw new InternalServerErrorException('Gagal upload profile');
+        throw new InternalServerErrorException('Gagal image hapus profile');
       }
     }
 

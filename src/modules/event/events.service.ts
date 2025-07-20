@@ -39,16 +39,9 @@ export class EventsService {
   }
 
   async findAll() {
-    const event = await this.prismaService.event.findMany();
-    if (event.length === 0) {
-      throw new HttpException(
-        {
-          message: 'Event masih kosong',
-          statusCode: '404',
-        },
-        400,
-      );
-    }
+    const event = await this.prismaService.event.findMany({
+      include: { user: true, category: true },
+    });
 
     return event;
   }
@@ -56,6 +49,7 @@ export class EventsService {
   async findOne(id: string) {
     const event = await this.prismaService.event.findUnique({
       where: { id },
+      include: { user: true, category: true },
     });
 
     if (!event) {

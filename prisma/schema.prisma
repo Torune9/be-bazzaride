@@ -65,7 +65,8 @@ model Store {
   id String @id @default(uuid())
   userId String @unique
   name String
-  image String
+  image String?
+  description String
 
   user User @relation(fields: [userId], references: [id])
 

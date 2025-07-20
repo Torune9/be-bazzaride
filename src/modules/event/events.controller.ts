@@ -19,12 +19,12 @@ import { AuthGuard } from 'src/guard/auth.guard';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 
-@UseGuards(AuthGuard, RolesGuard)
-@Roles('admin')
 @Controller('event')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
   @Post()
   @imageUploadInterceptor('poster')
   @HttpCode(HttpStatus.CREATED)
@@ -59,6 +59,8 @@ export class EventsController {
     };
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
   @Patch(':id')
   @imageUploadInterceptor('poster')
   async update(
@@ -73,6 +75,9 @@ export class EventsController {
       data: event,
     };
   }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
   @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.eventsService.remove(id);

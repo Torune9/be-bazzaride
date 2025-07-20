@@ -1,15 +1,52 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CloudinaryService } from 'src/libs/cloudinary/cloudinary.service';
+import { getPublicIdFromUrl } from 'src/helper/get-public-id';
 
 @Injectable()
 export class StoreService {
-  constructor(private prismaService: PrismaService) {}
-  create(createStoreDto: CreateStoreDto) {
-    return `This action adds a new store`;
+  constructor(
+    private prismaService: PrismaService,
+    private cloudinary: CloudinaryService,
+  ) {}
+  async create(createStoreDto: CreateStoreDto, file: Express.Multer.File) {
+    const existingStore = await this.prismaService.store.findFirst({
+      where: {
+        name: createStoreDto.name,
+      },
+    });
+
+    if (existingStore) {
+      throw new BadRequestException('Store already exists');
+    }
+
+    let imageUrl: string | undefined;
+
+    if (file) {
+      imageUrl = await this.cloudinary.uploadImage(file);
+    }
+
+    const store = await this.prismaService.store.create({
+      data: {
+        name: createStoreDto.name,
+        description: createStoreDto.description,
+        image: imageUrl,
+        user: {
+          connect: { id: createStoreDto.userId },
+        },
+      },
+    });
+
+    return store;
   }
 
   async findAll() {
@@ -30,13 +67,44 @@ export class StoreService {
     });
 
     if (!store) {
-      throw new Error('Store not found');
+      throw new NotFoundException('Store not found');
     }
+
     return store;
   }
 
-  update(id: number, updateStoreDto: UpdateStoreDto) {
-    return `This action updates a #${id} store`;
+  async update(
+    id: string,
+    updateStoreDto: UpdateStoreDto,
+    file?: Express.Multer.File,
+  ) {
+    const existingStore = await this.prismaService.store.findUnique({
+      where: { id },
+    });
+
+    if (!existingStore) {
+      throw new NotFoundException('Store tidak ditemukan');
+    }
+
+    if (file) {
+      const imageUpdateUrl = await this.cloudinary.uploadImage(file);
+      updateStoreDto.image = imageUpdateUrl;
+    }
+
+    if (existingStore.image) {
+      try {
+        const publicId = getPublicIdFromUrl(existingStore.image);
+        await this.cloudinary.deleteImage(publicId);
+      } catch (error) {
+        throw new InternalServerErrorException('Gagal hapus image store');
+      }
+    }
+    const updateStore = await this.prismaService.store.update({
+      where: { id },
+      data: updateStoreDto,
+    });
+
+    return updateStore;
   }
 
   async remove(id: string) {
@@ -47,7 +115,7 @@ export class StoreService {
     });
 
     if (!store) {
-      throw new Error('Store not found');
+      throw new NotFoundException('Store tidak ditemukan');
     }
     return store;
   }
