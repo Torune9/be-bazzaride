@@ -6,6 +6,7 @@ import { ProfileModule } from './profile/profile.module';
 import { UsersAddressesModule } from './users-addresses/users-addresses.module';
 import { CategoriesModule } from './categories/categories/categories.module';
 import { StoreModule } from './store/store.module';
+import { GoogleModule } from './google/google.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { StoreModule } from './store/store.module';
     UsersAddressesModule,
     CategoriesModule,
     StoreModule,
+    GoogleModule,
   ],
 })
 export class MasterModule {}
