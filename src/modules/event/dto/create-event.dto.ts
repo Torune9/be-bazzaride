@@ -19,6 +19,10 @@ export class CreateEventDto {
 
   @IsOptional()
   @IsString()
+  categoryId?: string;
+
+  @IsOptional()
+  @IsString()
   description: string;
 
   @Transform(({ value }) => parseInt(value, 10))

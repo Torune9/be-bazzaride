@@ -20,7 +20,7 @@ export class EventsService {
     private cloudinary: CloudinaryService,
   ) {}
   async create(createEventDto: CreateEventDto, file: Express.Multer.File) {
-    const { userId, ...restData } = createEventDto;
+    const { userId, categoryId, ...restData } = createEventDto;
 
     if (!file) {
       throw new BadRequestException('Poster tidak boleh kosong');
@@ -32,6 +32,7 @@ export class EventsService {
         ...restData,
         poster: posterUrl,
         user: { connect: { id: userId } },
+        category: { connect: { id: categoryId } },
       },
     });
 
@@ -49,14 +50,28 @@ export class EventsService {
   async findOne(id: string) {
     const event = await this.prismaService.event.findUnique({
       where: { id },
-      include: { user: true, category: true },
+      include: { category: true },
     });
 
     if (!event) {
       throw new NotFoundException('Profile tidak ditemukan');
     }
 
-    return event;
+    const relatedEvents = await this.prismaService.event.findMany({
+      where: {
+        categoryId: event.categoryId,
+        NOT: { id: event.id },
+      },
+      take: 5,
+    });
+
+    console.log('--> test', relatedEvents);
+    {
+      return {
+        event,
+        relatedEvents,
+      };
+    }
   }
 
   async update(
