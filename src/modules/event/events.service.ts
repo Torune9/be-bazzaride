@@ -63,9 +63,13 @@ export class EventsService {
         NOT: { id: event.id },
       },
       take: 5,
+      include: {
+        category: {
+          select: { name: true },
+        },
+      },
     });
 
-    console.log('--> test', relatedEvents);
     {
       return {
         event,
