@@ -12,6 +12,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
+import { log } from 'node:console';
 @Injectable()
 export class UsersService {
   constructor(
@@ -35,7 +36,6 @@ export class UsersService {
         username: createUserDto.username,
         email: createUserDto.email,
         password: await bcrypt.hash(createUserDto.password, 10),
-        role: { connect: { id: createUserDto.roleId } },
       },
     });
 
@@ -124,8 +124,39 @@ export class UsersService {
     };
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, userUpdateDto: UpdateUserDto) {
+    const oldUser = await this.prismaService.user.findUnique({
+      where: { id },
+    });
+
+    if (!oldUser) {
+      throw new Error('User tidak ditemukan');
+    }
+
+    const updatedData = {
+      email: userUpdateDto.email?.trim() || oldUser.email,
+      username: userUpdateDto.username?.trim() || oldUser.username,
+      roleId: userUpdateDto.roleId || oldUser.roleId,
+    };
+
+    const isSame =
+      updatedData.email === oldUser.email &&
+      updatedData.username === oldUser.username &&
+      updatedData.roleId === oldUser.roleId;
+
+    if (isSame) {
+      return { message: 'Tidak ada perubahan pada data user' };
+    }
+
+    const updatedUser = await this.prismaService.user.update({
+      where: { id },
+      data: updatedData,
+    });
+
+    return {
+      message: 'User berhasil diupdate',
+      data: updatedUser,
+    };
   }
 
   remove(id: number) {
