@@ -72,6 +72,7 @@ export class UsersService {
       id: userData.id,
       username: userData.username,
       email: loginUserDto.email,
+      roleId: userData.roleId,
     };
     if (!truePassword) {
       throw new HttpException(
