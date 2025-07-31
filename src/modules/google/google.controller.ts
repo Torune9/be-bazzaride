@@ -14,18 +14,13 @@ export class GoogleController {
   @Get('google/callback')
   async googleLogin(@Req() req: Request) {
     const { code } = req.query;
-    const { data, message } = await this.googleService.authGoogle(
-      code as string,
-    );
-    if (message) {
-      return {
-        message,
-        statusCode: HttpStatus.NOT_FOUND,
-      };
-    }
+    const result = await this.googleService.authGoogle(code as string);
+
     return {
-      message: 'login berhasil',
-      data,
+      message: result.message,
+      token: result.token,
+      roleId: result.roleId,
+      statusCode: HttpStatus.ACCEPTED,
     };
   }
 }

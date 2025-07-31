@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class GoogleService {
@@ -10,7 +12,11 @@ export class GoogleService {
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
   ];
-  constructor(config: ConfigService) {
+  constructor(
+    config: ConfigService,
+    private prismaService: PrismaService,
+    private jwtService: JwtService,
+  ) {
     this.authClient = new google.auth.OAuth2(
       config.get('GOOGLE_CLIENT_ID'),
       config.get('GOOGLE_SECRET_ID'),
@@ -41,10 +47,37 @@ export class GoogleService {
       return {
         message: 'data tidak ditemukan',
       };
-    } else {
-      return {
-        data,
-      };
     }
+
+    let user = await this.prismaService.user.findFirst({
+      where: {
+        email: {
+          equals: data.email as string,
+        },
+      },
+    });
+
+    if (!user) {
+      user = await this.prismaService.user.create({
+        data: {
+          email: data.email as string,
+          username: data.given_name as string,
+        },
+      });
+    }
+
+    const payload = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
+
+    const token = await this.jwtService.signAsync(payload);
+
+    return {
+      message: 'login berhasil',
+      token,
+      roleId: user.roleId,
+    };
   }
 }
