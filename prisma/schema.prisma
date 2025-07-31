@@ -28,14 +28,14 @@ model Profile {
   userId String @unique
   description String?
 
-  user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 }
 
 model User {
   id String @id @default(uuid())
   username String
   email String @unique
-  password String
+  password String?
   roleId Int? 
   
   role Role? @relation(fields: [roleId],references: [id],onDelete: SetNull)
@@ -51,7 +51,7 @@ model UserAddress {
   city String
   district String
 
-  user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 }
 
 model Category {
@@ -68,7 +68,7 @@ model Store {
   image String?
   description String
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id],onDelete: Cascade)
 
 }
 
@@ -82,6 +82,6 @@ model Event {
   address String
   poster String
   
-  category Category? @relation(fields: [categoryId],references: [id])
-  user User @relation(fields: [userId],references: [id])
+  category Category? @relation(fields: [categoryId],references: [id],onDelete: SetNull)
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 }
