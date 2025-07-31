@@ -12,7 +12,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { log } from 'node:console';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -29,7 +29,10 @@ export class UsersService {
       },
     });
     if (userExist) {
-      throw new ConflictException();
+      throw new ConflictException({
+        messaage: 'email sudah terdaftar',
+        statusCode: HttpStatus.CONFLICT,
+      });
     }
     const data = await this.prismaService.user.create({
       data: {
@@ -46,7 +49,7 @@ export class UsersService {
 
   async login(
     loginUserDto: LoginUserDto,
-  ): Promise<{ data: object; token: string }> {
+  ): Promise<{ data: object; token: string; roleId: number }> {
     const userData = await this.prismaService.user.findFirst({
       where: {
         email: {
@@ -63,29 +66,32 @@ export class UsersService {
         404,
       );
     }
-    const truePassword = await bcrypt.compare(
-      loginUserDto.password,
-      userData.password,
-    );
 
     const payload = {
       id: userData.id,
       username: userData.username,
       email: loginUserDto.email,
-      roleId: userData.roleId,
     };
-    if (!truePassword) {
-      throw new HttpException(
-        {
-          message: 'password salah',
-          statusCode: HttpStatus.BAD_REQUEST,
-        },
-        400,
+
+    if (userData.password) {
+      const truePassword = await bcrypt.compare(
+        loginUserDto.password,
+        userData.password,
       );
+      if (!truePassword) {
+        throw new HttpException(
+          {
+            message: 'password salah',
+            statusCode: HttpStatus.BAD_REQUEST,
+          },
+          400,
+        );
+      }
     }
     return {
       data: payload,
       token: await this.jwtService.signAsync(payload),
+      roleId: userData.roleId as number,
     };
   }
 
