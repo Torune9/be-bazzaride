@@ -120,6 +120,7 @@ export class UsersService {
     };
 
     return {
+      roleId : user.roleId,
       token: await this.jwtService.signAsync(payload),
     };
   }

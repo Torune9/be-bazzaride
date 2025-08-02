@@ -59,10 +59,11 @@ export class UsersController {
 
   @Get('me/:id')
   async me(@Param('id') id: string) {
-    const { token } = await this.usersService.me(id);
+    const { token, roleId } = await this.usersService.me(id);
     return {
       message: 'login berhasil',
       tokenAccess: token,
+      roleId,
     };
   }
 
