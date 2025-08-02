@@ -57,6 +57,15 @@ export class UsersController {
     };
   }
 
+  @Get('me/:id')
+  async me(@Param('id') id: string) {
+    const { token } = await this.usersService.me(id);
+    return {
+      message: 'login berhasil',
+      tokenAccess: token,
+    };
+  }
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const { data, message } = await this.usersService.update(id, updateUserDto);
