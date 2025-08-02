@@ -95,6 +95,35 @@ export class UsersService {
     };
   }
 
+  async me(id: string) {
+    const user = await this.prismaService.user.findFirst({
+      where: {
+        id: {
+          equals: id,
+        },
+      },
+      include: {
+        profile: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException({
+        message: 'user not found',
+      });
+    }
+
+    const payload = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+    };
+
+    return {
+      token: await this.jwtService.signAsync(payload),
+    };
+  }
+
   async findAll() {
     const users = await this.prismaService.user.findMany();
 
