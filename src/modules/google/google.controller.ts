@@ -12,15 +12,15 @@ export class GoogleController {
   }
 
   @Get('google/callback')
-  async googleLogin(@Req() req: Request) {
+  async googleLogin(@Req() req: Request, @Res() res: Response) {
     const { code } = req.query;
     const result = await this.googleService.authGoogle(code as string);
-
-    return {
-      message: result.message,
-      token: result.token,
-      roleId: result.roleId,
-      statusCode: HttpStatus.ACCEPTED,
-    };
+    if (result.error) {
+      return res.status(500).json({
+        message: 'error ketika login',
+        errors: result.error,
+      });
+    }
+    return res.redirect(`http://localhost:5000/auth/success?id=${result.id}`);
   }
 }
