@@ -34,50 +34,50 @@ export class GoogleService {
   }
 
   async authGoogle(code: string) {
-    const { tokens } = await this.authClient.getToken(code);
-    this.authClient.setCredentials(tokens);
-    const oauth2 = google.oauth2({
-      auth: this.authClient,
-      version: 'v2',
-    });
+    try {
+      const { tokens } = await this.authClient.getToken(code);
+      this.authClient.setCredentials(tokens);
 
-    const { data } = await oauth2.userinfo.get();
+      const oauth2 = google.oauth2({
+        auth: this.authClient,
+        version: 'v2',
+      });
 
-    if (!data) {
-      return {
-        message: 'data tidak ditemukan',
-      };
-    }
+      const { data } = await oauth2.userinfo.get();
 
-    let user = await this.prismaService.user.findFirst({
-      where: {
-        email: {
-          equals: data.email as string,
-        },
-      },
-    });
+      if (!data || !data.email) {
+        return {
+          message: 'Data pengguna tidak ditemukan dari Google.',
+        };
+      }
 
-    if (!user) {
-      user = await this.prismaService.user.create({
-        data: {
-          email: data.email as string,
-          username: data.given_name as string,
+      let user = await this.prismaService.user.findFirst({
+        where: {
+          email: {
+            equals: data.email,
+          },
         },
       });
+
+      if (!user) {
+        user = await this.prismaService.user.create({
+          data: {
+            email: data.email,
+            username: data.given_name || 'google_user',
+          },
+        });
+      }
+
+      return {
+        message: 'Login berhasil',
+        id: user.id,
+      };
+    } catch (error: any) {
+      console.error('Google Auth Error:', error);
+      return {
+        message: 'Terjadi kesalahan saat otentikasi dengan Google.',
+        error: error?.message || 'Unknown error',
+      };
     }
-
-    const payload = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-    };
-
-    const token = await this.jwtService.signAsync(payload);
-
-    return {
-      message: 'login berhasil',
-      token,
-      roleId: user.roleId,
-    };
   }
 }
