@@ -9,13 +9,14 @@ import {
   HttpStatus,
   UseGuards,
   Res,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login.dto';
 import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('user')
 export class UsersController {
@@ -64,9 +65,10 @@ export class UsersController {
   }
 
   @UseGuards(JwtCookieAuthGuard)
-  @Get('me/:id')
-  async me(@Param('id') id: string) {
-    const { data } = await this.usersService.me(id);
+  @Get('current/account')
+  async me(@Req() req: Request) {
+    const user = req['user'];
+    const { data } = await this.usersService.me(user.id);
     return {
       message: 'login berhasil',
       data,
