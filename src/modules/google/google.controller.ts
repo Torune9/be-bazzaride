@@ -28,6 +28,6 @@ export class GoogleController {
       maxAge: 60 * 60 * 1000,
     });
 
-    return res.redirect(`http://localhost:5000/auth/success?id=${result.id}`);
+    return res.redirect(`http://localhost:5000/auth/success`);
   }
 }

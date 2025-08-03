@@ -68,10 +68,17 @@ export class GoogleService {
         });
       }
 
+      const payload = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      };
+
       return {
         message: 'Login berhasil',
-        id: user.id,
+        token: await this.jwtService.signAsync(payload),
       };
+      
     } catch (error: any) {
       console.error('Google Auth Error:', error);
       return {
