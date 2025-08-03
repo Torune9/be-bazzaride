@@ -21,6 +21,13 @@ export class GoogleController {
         errors: result.error,
       });
     }
+    res.cookie('access_token', result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000,
+    });
+
     return res.redirect(`http://localhost:5000/auth/success?id=${result.id}`);
   }
 }
