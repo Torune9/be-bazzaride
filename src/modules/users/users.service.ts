@@ -102,6 +102,9 @@ export class UsersService {
           equals: id,
         },
       },
+      omit: {
+        password: true,
+      },
       include: {
         profile: true,
       },
@@ -113,15 +116,8 @@ export class UsersService {
       });
     }
 
-    const payload = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-    };
-
     return {
-      roleId : user.roleId,
-      token: await this.jwtService.signAsync(payload),
+      data: user,
     };
   }
 

@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   HttpStatus,
+  UseGuards,
+  Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login.dto';
+import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
+import { Response } from 'express';
 
 @Controller('user')
 export class UsersController {
@@ -29,14 +33,16 @@ export class UsersController {
   }
 
   @Post('login')
-  async login(@Body() loginUserDtoo: LoginUserDto) {
+  async login(@Body() loginUserDtoo: LoginUserDto, @Res() res: Response) {
     const { data, token } = await this.usersService.login(loginUserDtoo);
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 1000,
+    });
 
-    return {
-      message: 'login berhasil',
-      data: data,
-      access_token: token,
-    };
+    return res.status(200).json({ message: 'Login successful', data });
   }
 
   @Get()
@@ -57,13 +63,13 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtCookieAuthGuard)
   @Get('me/:id')
   async me(@Param('id') id: string) {
-    const { token, roleId } = await this.usersService.me(id);
+    const { data } = await this.usersService.me(id);
     return {
       message: 'login berhasil',
-      tokenAccess: token,
-      roleId,
+      data,
     };
   }
 
