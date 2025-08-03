@@ -30,7 +30,7 @@ export class UsersService {
     });
     if (userExist) {
       throw new ConflictException({
-        messaage: 'email sudah terdaftar',
+        message: 'email sudah terdaftar',
         statusCode: HttpStatus.CONFLICT,
       });
     }
@@ -49,12 +49,15 @@ export class UsersService {
 
   async login(
     loginUserDto: LoginUserDto,
-  ): Promise<{ data: object; token: string; roleId: number }> {
+  ): Promise<{ data: object; token: string; role: object | null }> {
     const userData = await this.prismaService.user.findFirst({
       where: {
         email: {
           equals: loginUserDto.email,
         },
+      },
+      include: {
+        role: true,
       },
     });
     if (!userData) {
@@ -91,7 +94,7 @@ export class UsersService {
     return {
       data: payload,
       token: await this.jwtService.signAsync(payload),
-      roleId: userData.roleId as number,
+      role: userData.role || null,
     };
   }
 

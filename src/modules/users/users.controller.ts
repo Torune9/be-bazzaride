@@ -35,7 +35,7 @@ export class UsersController {
 
   @Post('login')
   async login(@Body() loginUserDtoo: LoginUserDto, @Res() res: Response) {
-    const { data, token } = await this.usersService.login(loginUserDtoo);
+    const { data, role, token } = await this.usersService.login(loginUserDtoo);
     res.cookie('access_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -43,7 +43,7 @@ export class UsersController {
       maxAge: 60 * 60 * 1000,
     });
 
-    return res.status(200).json({ message: 'Login successful', data });
+    return res.status(200).json({ message: 'Login successful', data, role });
   }
 
   @Get()
