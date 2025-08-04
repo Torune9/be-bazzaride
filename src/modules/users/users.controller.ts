@@ -46,6 +46,17 @@ export class UsersController {
     return res.status(200).json({ message: 'Login successful', data, role });
   }
 
+  @UseGuards(JwtCookieAuthGuard)
+  @Get('me')
+  async me(@Req() req: Request) {
+    const user = req['user'];
+    const { data } = await this.usersService.me(user.id);
+    return {
+      message: 'login berhasil',
+      data,
+    };
+  }
+
   @Get()
   async findAll() {
     const { data, message } = await this.usersService.findAll();
@@ -61,17 +72,6 @@ export class UsersController {
     return {
       message: 'user ditemukan',
       data: data,
-    };
-  }
-
-  @UseGuards(JwtCookieAuthGuard)
-  @Get('current/account')
-  async me(@Req() req: Request) {
-    const user = req['user'];
-    const { data } = await this.usersService.me(user.id);
-    return {
-      message: 'login berhasil',
-      data,
     };
   }
 
