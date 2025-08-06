@@ -15,9 +15,9 @@ import { ProfileService } from './profile.service';
 import { imageUploadInterceptor } from 'src/common/interception-multer';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { AuthGuard } from 'src/guard/auth.guard';
+import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
 
-@UseGuards(AuthGuard)
+@UseGuards(JwtCookieAuthGuard)
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}

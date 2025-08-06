@@ -15,9 +15,9 @@ import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { paramBadRequest } from 'src/common/filters/paramBadRequest.filter';
-import { AuthGuard } from 'src/guard/auth.guard';
+import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
 
-@UseGuards(AuthGuard)
+@UseGuards(JwtCookieAuthGuard)
 @Controller('role')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}

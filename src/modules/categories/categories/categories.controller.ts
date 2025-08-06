@@ -6,14 +6,17 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateCategoryDto } from '../dto/category.dto';
 import { CategoriesService } from './categories.service';
+import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
 
 @Controller('categories')
 export class CategoriesController {
   constructor(private categoryService: CategoriesService) {}
 
+  @UseGuards(JwtCookieAuthGuard)
   @Post()
   async create(@Body() payload: CreateCategoryDto) {
     const category = await this.categoryService.createCategory(payload);
@@ -39,6 +42,7 @@ export class CategoriesController {
       data: category,
     };
   }
+  @UseGuards(JwtCookieAuthGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() body: { name?: string }) {
     if (!body.name) {
@@ -53,6 +57,7 @@ export class CategoriesController {
     };
   }
 
+  @UseGuards(JwtCookieAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: string) {
     const isDelete = await this.categoryService.deleteCategory(id);

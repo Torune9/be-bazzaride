@@ -11,9 +11,9 @@ import {
 import { UsersAddressesService } from './users-addresses.service';
 import { CreateUsersAddressDto } from './dto/create-users-address.dto';
 import { UpdateUsersAddressDto } from './dto/update-users-address.dto';
-import { AuthGuard } from 'src/guard/auth.guard';
+import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
 
-@UseGuards(AuthGuard)
+@UseGuards(JwtCookieAuthGuard)
 @Controller('users-addresses')
 export class UsersAddressesController {
   constructor(private readonly usersAddressesService: UsersAddressesService) {}

@@ -18,6 +18,7 @@ import { imageUploadInterceptor } from 'src/common/interception-multer';
 import { AuthGuard } from 'src/guard/auth.guard';
 import { RolesGuard } from 'src/guard/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
 
 @Controller('event')
 export class EventsController {
@@ -59,7 +60,7 @@ export class EventsController {
     };
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(JwtCookieAuthGuard, RolesGuard)
   @Roles('admin')
   @Patch(':id')
   @imageUploadInterceptor('poster')
@@ -76,7 +77,7 @@ export class EventsController {
     };
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(JwtCookieAuthGuard, RolesGuard)
   @Roles('admin')
   @Delete(':id')
   async remove(@Param('id') id: string) {
