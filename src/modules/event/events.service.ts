@@ -18,7 +18,7 @@ export class EventsService {
   constructor(
     private prismaService: PrismaService,
     private cloudinary: CloudinaryService,
-  ) {}
+  ) { }
   async create(createEventDto: CreateEventDto, file: Express.Multer.File) {
     const { userId, categoryId, ...restData } = createEventDto;
 
@@ -39,12 +39,25 @@ export class EventsService {
     return createEvent;
   }
 
-  async findAll() {
-    const event = await this.prismaService.event.findMany({
-      include: { user: true, category: true },
-    });
+  async findAll(page: number) {
+    const limit = 10;
+    const skip = page * limit;
 
-    return event;
+    const [data, total] = await Promise.all([
+      this.prismaService.event.findMany({
+        include: { user: true, category: true },
+        skip: skip ? skip : 0,
+        take: limit,
+      }),
+      this.prismaService.event.count(),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: string) {

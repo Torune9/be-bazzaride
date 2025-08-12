@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UploadedFile,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -41,12 +42,16 @@ export class EventsController {
   }
 
   @Get()
-  async findAll() {
-    const event = await this.eventsService.findAll();
+  async findAll(@Query('page') count: number) {
+    const { data, total, page, totalPages } =
+      await this.eventsService.findAll(count);
 
     return {
       message: 'data event berhasil di dapatkan',
-      data: event,
+      data,
+      total,
+      page,
+      totalPages,
     };
   }
 
