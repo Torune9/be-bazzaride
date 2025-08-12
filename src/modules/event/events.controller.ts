@@ -23,7 +23,7 @@ import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
 
 @Controller('event')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(private readonly eventsService: EventsService) { }
 
   @UseGuards(AuthGuard, RolesGuard)
   @Roles('admin')
@@ -54,7 +54,14 @@ export class EventsController {
       totalPages,
     };
   }
-
+  @Get('latest')
+  async findLatest() {
+    const { event } = await this.eventsService.getLatest();
+    return {
+      message: 'berhasil mendapatkan event terbaru',
+      data: event,
+    };
+  }
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const event = await this.eventsService.findOne(id);
