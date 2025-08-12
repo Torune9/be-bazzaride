@@ -66,6 +66,7 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtCookieAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const { data } = await this.usersService.findOne(id);
@@ -75,6 +76,7 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtCookieAuthGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const { data, message } = await this.usersService.update(id, updateUserDto);
@@ -91,6 +93,7 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtCookieAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
