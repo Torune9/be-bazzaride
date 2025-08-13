@@ -65,6 +65,7 @@ export class EventsService {
     const event = await this.prismaService.event.findMany({
       orderBy: { createdAt: 'desc' },
       take: 2,
+      include: { user: true, category: true },
     });
 
     return {
