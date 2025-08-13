@@ -55,8 +55,8 @@ export class EventsController {
     };
   }
   @Get('latest')
-  async findLatest() {
-    const { event } = await this.eventsService.getLatest();
+  async findLatest(@Query('maxLimit') max: boolean) {
+    const { event } = await this.eventsService.getLatest(max);
     return {
       message: 'berhasil mendapatkan event terbaru',
       data: event,

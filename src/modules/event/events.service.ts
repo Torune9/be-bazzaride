@@ -61,10 +61,10 @@ export class EventsService {
     };
   }
 
-  async getLatest() {
+  async getLatest(max: boolean) {
     const event = await this.prismaService.event.findMany({
       orderBy: { createdAt: 'desc' },
-      take: 2,
+      take: max ? 8 : 2,
       include: { user: true, category: true },
     });
 
