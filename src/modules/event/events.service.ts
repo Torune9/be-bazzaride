@@ -18,7 +18,7 @@ export class EventsService {
   constructor(
     private prismaService: PrismaService,
     private cloudinary: CloudinaryService,
-  ) {}
+  ) { }
   async create(createEventDto: CreateEventDto, file: Express.Multer.File) {
     const { userId, categoryId, ...restData } = createEventDto;
 
@@ -45,8 +45,9 @@ export class EventsService {
 
     const [data, total] = await Promise.all([
       this.prismaService.event.findMany({
+        orderBy: { createdAt: 'desc' },
         include: { user: true, category: true },
-        skip: skip ? skip : 0,
+        skip: skip ? skip : 2,
         take: limit,
       }),
       this.prismaService.event.count(),
