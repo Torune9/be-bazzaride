@@ -16,11 +16,12 @@ import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { imageUploadInterceptor } from 'src/common/interception-multer';
 import { AuthGuard } from 'src/guard/auth.guard';
+import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
 
 @Controller('store')
 export class StoreController {
   constructor(private readonly storeService: StoreService) {}
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtCookieAuthGuard)
   @Post()
   @imageUploadInterceptor('image')
   @HttpCode(HttpStatus.CREATED)
@@ -56,7 +57,7 @@ export class StoreController {
     };
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtCookieAuthGuard)
   @Patch(':id')
   @imageUploadInterceptor('image')
   async update(
@@ -76,7 +77,7 @@ export class StoreController {
     };
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtCookieAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.storeService.remove(id);
