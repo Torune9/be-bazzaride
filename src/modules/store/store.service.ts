@@ -19,16 +19,6 @@ export class StoreService {
     private cloudinary: CloudinaryService,
   ) {}
   async create(createStoreDto: CreateStoreDto, file: Express.Multer.File) {
-    const existingStore = await this.prismaService.store.findFirst({
-      where: {
-        name: createStoreDto.name,
-      },
-    });
-
-    if (existingStore) {
-      throw new BadRequestException('Store already exists');
-    }
-
     let imageUrl: string | undefined;
 
     if (file) {
