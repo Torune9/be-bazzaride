@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 export class CreateStoreDto {
   @IsNotEmpty()
   @IsUUID()
@@ -7,10 +7,6 @@ export class CreateStoreDto {
   @IsNotEmpty()
   @IsString()
   name: string;
-
-  @IsOptional()
-  @IsString()
-  image?: string;
 
   @IsNotEmpty()
   @IsString()
