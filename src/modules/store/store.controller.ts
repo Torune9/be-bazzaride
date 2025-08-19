@@ -26,8 +26,8 @@ export class StoreController {
   @imageUploadInterceptor('image')
   @HttpCode(HttpStatus.CREATED)
   async create(
-    @Body() createStoreDto: CreateStoreDto,
     @UploadedFile() file: Express.Multer.File,
+    @Body() createStoreDto: CreateStoreDto,
   ) {
     const newStore = await this.storeService.create(createStoreDto, file);
 
