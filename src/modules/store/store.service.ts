@@ -52,7 +52,7 @@ export class StoreService {
   async findOne(id: string) {
     const store = await this.prismaService.store.findUnique({
       where: {
-        id,
+        userId: id,
       },
     });
 
@@ -75,10 +75,10 @@ export class StoreService {
     if (!existingStore) {
       throw new NotFoundException('Store tidak ditemukan');
     }
+    let imageUpdateUrl: any;
 
     if (file) {
-      const imageUpdateUrl = await this.cloudinary.uploadImage(file);
-      updateStoreDto.image = imageUpdateUrl;
+      imageUpdateUrl = await this.cloudinary.uploadImage(file);
     }
 
     if (existingStore.image) {
@@ -91,7 +91,10 @@ export class StoreService {
     }
     const updateStore = await this.prismaService.store.update({
       where: { id },
-      data: updateStoreDto,
+      data: {
+        ...updateStoreDto,
+        image: imageUpdateUrl,
+      },
     });
 
     return updateStore;
