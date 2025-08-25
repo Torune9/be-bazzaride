@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -42,32 +44,21 @@ export class ProfileService {
 
       return profile;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2025') {
-          throw new NotFoundException('User id tidak ditemukan');
-        }
-
-        if (error.code === 'P2002') {
-          throw new ConflictException('Profile sudah ada');
-        }
-      }
-
-      throw new BadRequestException();
+      console.error('Error creating profile:', error);
     }
   }
 
-  async findAll() {
-    try {
-      const profile = await this.prismaService.profile.findMany({
-        include: {
-          user: true,
-        },
-      });
+  async getProfile(userId: string) {
+    const profile = await this.prismaService.profile.findFirst({
+      where: { userId },
+      include: { user: { include: { store: true } } },
+    });
 
-      return profile;
-    } catch (error) {
-      throw new BadRequestException();
+    if (!profile) {
+      throw new NotFoundException('Profile tidak ditemukan');
     }
+
+    return profile;
   }
 
   async findOne(id: string) {
@@ -92,12 +83,12 @@ export class ProfileService {
   }
 
   async update(
-    id: string,
+    userId: string,
     updateProfileDto: UpdateProfileDto,
     file?: Express.Multer.File,
   ) {
     const existing = await this.prismaService.profile.findUnique({
-      where: { id },
+      where: { userId },
     });
 
     if (!existing) {
@@ -119,7 +110,7 @@ export class ProfileService {
     }
 
     const updated = await this.prismaService.profile.update({
-      where: { id },
+      where: { userId },
       data: updateProfileDto,
     });
 

@@ -93,7 +93,9 @@ export class UsersService {
     }
     return {
       data: payload,
-      token: await this.jwtService.signAsync(payload),
+      token: await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET,
+      }),
       role: userData.role || null,
     };
   }

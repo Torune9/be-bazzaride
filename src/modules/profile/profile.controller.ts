@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { imageUploadInterceptor } from 'src/common/interception-multer';
@@ -37,9 +38,11 @@ export class ProfileController {
     };
   }
 
-  @Get()
-  async findAll() {
-    const profile = await this.profileService.findAll();
+  @Get('/me')
+  async getMe(@Req() req: Request) {
+    const userId = req['user'].id;
+    console.log('userId ->', userId);
+    const profile = await this.profileService.getProfile(userId);
 
     return {
       data: profile,

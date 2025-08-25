@@ -18,7 +18,7 @@ export class EventsService {
   constructor(
     private prismaService: PrismaService,
     private cloudinary: CloudinaryService,
-  ) { }
+  ) {}
   async create(createEventDto: CreateEventDto, file: Express.Multer.File) {
     const { userId, categoryId, ...restData } = createEventDto;
 
