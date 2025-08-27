@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UseGuards,
   Req,
+  Put,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { imageUploadInterceptor } from 'src/common/interception-multer';
@@ -27,10 +28,16 @@ export class ProfileController {
   @imageUploadInterceptor('image')
   @HttpCode(HttpStatus.CREATED)
   async create(
+    @Req() req: Request,
     @Body() createProfileDto: CreateProfileDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const profile = await this.profileService.create(createProfileDto, file);
+    const userId = req['user'].id;
+    const profile = await this.profileService.create(
+      createProfileDto,
+      file,
+      userId,
+    );
 
     return {
       data: profile,
@@ -60,15 +67,16 @@ export class ProfileController {
     };
   }
 
-  @Patch(':id')
+  @Put('/update')
   @imageUploadInterceptor('image')
   async update(
-    @Param('id') id: string,
+    @Req() req: Request,
     @Body() updateProfileDto: UpdateProfileDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
+    const userId = req['user'].id;
     const profile = await this.profileService.update(
-      id,
+      userId,
       updateProfileDto,
       file,
     );

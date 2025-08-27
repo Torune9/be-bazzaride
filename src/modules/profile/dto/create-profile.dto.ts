@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateProfileDto {
   @IsNotEmpty()
@@ -17,8 +17,4 @@ export class CreateProfileDto {
   @IsOptional()
   @IsString()
   description?: string;
-
-  @IsNotEmpty()
-  @IsUUID()
-  userId: string;
 }

@@ -20,9 +20,13 @@ export class ProfileService {
     private prismaService: PrismaService,
     private cloudinary: CloudinaryService,
   ) {}
-  async create(createProfileDto: CreateProfileDto, file: Express.Multer.File) {
+  async create(
+    createProfileDto: CreateProfileDto,
+    file: Express.Multer.File,
+    userId,
+  ) {
     try {
-      const { userId, firstName, lastName, description } = createProfileDto;
+      const { firstName, lastName, description } = createProfileDto;
 
       let imageUrl: string | undefined;
 
@@ -87,7 +91,7 @@ export class ProfileService {
     updateProfileDto: UpdateProfileDto,
     file?: Express.Multer.File,
   ) {
-    const existing = await this.prismaService.profile.findUnique({
+    const existing = await this.prismaService.profile.findFirst({
       where: { userId },
     });
 
