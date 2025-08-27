@@ -43,8 +43,7 @@ export class EventsController {
 
   @Get()
   async findAll(@Query('page') count: number) {
-    const { data, total, page, totalPages } =
-      await this.eventsService.findAll(count);
+    const { data, total, page, totalPages } = await this.eventsService.findAll(count, true);
 
     return {
       message: 'data event berhasil di dapatkan',
