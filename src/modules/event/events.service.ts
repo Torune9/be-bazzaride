@@ -39,26 +39,16 @@ export class EventsService {
     return createEvent;
   }
 
-  async findAll(page: number) {
+  async findAll(page: number, skipFirstTwo = false) {
     const limit = 10;
-    const skip = page * limit;
+    const skip = page * limit + (skipFirstTwo ? 2 : 0); // ✅ fleksibel
 
     const [data, total] = await Promise.all([
       this.prismaService.event.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-            },
-          },
-          category: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
+          user: { select: { id: true, username: true } },
+          category: { select: { id: true, name: true } },
         },
         skip,
         take: limit,
@@ -73,7 +63,6 @@ export class EventsService {
       totalPages: Math.ceil(total / limit),
     };
   }
-
 
   async getLatest(max: boolean) {
     const event = await this.prismaService.event.findMany({
