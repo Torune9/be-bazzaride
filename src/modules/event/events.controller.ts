@@ -16,17 +16,17 @@ import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { imageUploadInterceptor } from 'src/common/interception-multer';
-import { AuthGuard } from 'src/guard/auth.guard';
+
 import { RolesGuard } from 'src/guard/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
 
 @Controller('event')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) { }
+  constructor(private readonly eventsService: EventsService) {}
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles('admin')
+  @UseGuards(JwtCookieAuthGuard, RolesGuard)
+  @Roles('Admin')
   @Post()
   @imageUploadInterceptor('poster')
   @HttpCode(HttpStatus.CREATED)
