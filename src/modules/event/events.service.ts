@@ -41,7 +41,7 @@ export class EventsService {
 
   async findAll(page: number, skipFirstTwo = false) {
     const limit = 10;
-    const skip = page * limit + (skipFirstTwo ? 2 : 0); // ✅ fleksibel
+    const skip = page * limit + (skipFirstTwo ? 2 : 0);
 
     const [data, total] = await Promise.all([
       this.prismaService.event.findMany({
