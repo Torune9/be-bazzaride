@@ -25,7 +25,7 @@ export class GoogleController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     return res.redirect(`http://localhost:5000/auth/success`);
