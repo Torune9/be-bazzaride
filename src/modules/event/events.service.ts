@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BadRequestException,
-  HttpException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -18,7 +16,14 @@ export class EventsService {
   constructor(
     private prismaService: PrismaService,
     private cloudinary: CloudinaryService,
-  ) { }
+  ) {}
+
+  async count() {
+    return {
+      total: await this.prismaService.event.count(),
+    };
+  }
+
   async create(createEventDto: CreateEventDto, file: Express.Multer.File) {
     const { userId, categoryId, ...restData } = createEventDto;
 
