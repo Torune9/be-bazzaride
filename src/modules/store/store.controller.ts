@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Put,
   Param,
   Delete,
   HttpCode,
@@ -15,7 +15,6 @@ import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { imageUploadInterceptor } from 'src/common/interception-multer';
-import { AuthGuard } from 'src/guard/auth.guard';
 import { JwtCookieAuthGuard } from 'src/guard/jwt-cookie.guard';
 
 @Controller('store')
@@ -58,7 +57,7 @@ export class StoreController {
   }
 
   @UseGuards(JwtCookieAuthGuard)
-  @Patch(':id')
+  @Put(':id')
   @imageUploadInterceptor('image')
   async update(
     @Param('id') id: string,
