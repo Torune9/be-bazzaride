@@ -89,6 +89,7 @@ async function main() {
   }
 
   // 5. Buat 50 event
+  // 5. Buat 50 event
   for (let i = 1; i <= 50; i++) {
     await prisma.event.create({
       data: {
@@ -99,6 +100,7 @@ async function main() {
         quota: faker.number.int({ min: 50, max: 500 }),
         address: faker.location.streetAddress(),
         poster: faker.image.urlLoremFlickr({ category: 'event' }),
+        date: faker.date.soon({ days: 90 }), // event dalam 90 hari ke depan
       },
     });
   }

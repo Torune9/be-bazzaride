@@ -86,6 +86,7 @@ model Event {
   quota       Int
   address     String
   poster      String
+  date        DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
