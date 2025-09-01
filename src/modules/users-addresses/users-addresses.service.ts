@@ -33,7 +33,7 @@ export class UsersAddressesService {
   }
 
   async findOne(id: string) {
-    const addresses = await this.prismaService.userAddress.findMany({
+    const addresses = await this.prismaService.userAddress.findFirst({
       where: {
         userId: {
           equals: id,

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { UsersAddressesService } from './users-addresses.service';
 import { CreateUsersAddressDto } from './dto/create-users-address.dto';
@@ -42,7 +43,7 @@ export class UsersAddressesController {
     };
   }
 
-  @Patch(':id')
+  @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() updateUsersAddressDto: UpdateUsersAddressDto,

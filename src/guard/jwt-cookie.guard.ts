@@ -15,7 +15,6 @@ export class JwtCookieAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<Request>();
     const token = req.cookies?.['access_token'];
-    console.log('token ->', token);
 
     if (!token) {
       throw new UnauthorizedException('Token tidak ditemukan di cookie');
@@ -26,7 +25,6 @@ export class JwtCookieAuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
       req['user'] = payload;
-      console.log('payload ->', payload);
       return true;
     } catch (err) {
       console.error('JWT verify error:', err);

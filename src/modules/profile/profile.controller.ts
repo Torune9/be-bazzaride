@@ -48,7 +48,7 @@ export class ProfileController {
   @Get('/me')
   async getMe(@Req() req: Request) {
     const userId = req['user'].id;
-    console.log('userId ->', userId);
+
     const profile = await this.profileService.getProfile(userId);
 
     return {

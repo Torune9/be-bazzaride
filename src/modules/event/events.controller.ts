@@ -11,6 +11,7 @@ import {
   UploadedFile,
   UseGuards,
   Query,
+  Put,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -81,16 +82,16 @@ export class EventsController {
   }
 
   @UseGuards(JwtCookieAuthGuard, RolesGuard)
-  @Roles('admin')
-  @Patch(':id')
+  @Roles('Admin')
+  @Put(':id')
   @imageUploadInterceptor('poster')
   async update(
     @Param('id') id: string,
     @Body() updateEventDto: UpdateEventDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
+    console.log(id, 'test');
     const event = await this.eventsService.update(id, updateEventDto, file);
-
     return {
       message: 'Update event berhasil!',
       data: event,
@@ -98,7 +99,7 @@ export class EventsController {
   }
 
   @UseGuards(JwtCookieAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('Admin')
   @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.eventsService.remove(id);

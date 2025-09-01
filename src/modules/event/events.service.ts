@@ -122,7 +122,7 @@ export class EventsService {
     });
 
     if (!existing) {
-      throw new NotFoundException();
+      throw new NotFoundException('Event  tidak ditemukan');
     }
 
     const dataToUpdate: Partial<UpdateEventDto> & { poster?: string } = {
